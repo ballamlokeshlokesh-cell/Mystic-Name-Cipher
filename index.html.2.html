@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secret Cipher & Match Generator</title>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --accent: #a855f7;
+            --bg: #0f172a;
+            --card-bg: #1e293b;
+            --text: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .container {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 25px rgba(99, 102, 241, 0.1);
+            width: 100%;
+            max-width: 440px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 8px;
+            background: linear-gradient(to right, #4f46e5, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        p.subtitle {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-top: 0;
+            margin-bottom: 24px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-muted);
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 14px;
+            background: rgba(15, 23, 42, 0.6);
+            border: 2px solid #334155;
+            border-radius: 12px;
+            color: white;
+            font-size: 16px;
+            box-sizing: border-box;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 12px rgba(99, 102, 241, 0.2);
+        }
+
+        button {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            border: none;
+            padding: 14px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 12px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+            transition: transform 0.2s, opacity 0.2s;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+
+        button:hover {
+            opacity: 0.95;
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        .results {
+            margin-top: 30px;
+            display: none;
+            text-align: left;
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-item {
+            background: rgba(15, 23, 42, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 16px;
+            border-radius: 14px;
+            margin-bottom: 12px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .result-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+
+        .result-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: #f43f5e;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        .secret-name-val {
+            color: #38bdf8;
+            font-family: inherit;
+            font-style: italic;
+        }
+
+        .lucky-num-val {
+            color: #22c55e;
+            font-size: 22px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>🔮 Mystic Name Cipher</h1>
+        <p class="subtitle">Generate your unique secret matches instantly</p>
+        
+        <div class="input-group">
+            <label for="name1">First Name:</label>
+            <input type="text" id="name1" placeholder="Enter name...">
+        </div>
+
+        <div class="input-group">
+            <label for="name2">Second Name:</label>
+            <input type="text" id="name2" placeholder="Enter name...">
+        </div>
+
+        <button onclick="generateSecrets()">Reveal Our Secrets</button>
+
+        <div class="results" id="resultsBox">
+            <div class="result-item">
+                <span class="result-label">🔒 Secret Code</span>
+                <span class="result-value" id="secretCode">---</span>
+            </div>
+            
+            <div class="result-item">
+                <span class="result-label">🔢 Secret Number</span>
+                <span class="result-value" id="secretNumber">---</span>
+            </div>
+
+            <div class="result-item">
+                <span class="result-label">✨ Secret Name</span>
+                <span class="result-value secret-name-val" id="secretName">---</span>
+            </div>
+
+            <div class="result-item">
+                <span class="result-label">🍀 Lucky Number</span>
+                <span class="result-value lucky-num-val" id="luckyNumber">---</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function generateSecrets() {
+            const n1 = document.getElementById('name1').value.trim();
+            const n2 = document.getElementById('name2').value.trim();
+
+            if (n1 === "" || n2 === "") {
+                alert("Please enter both names to generate the values!");
+                return;
+            }
+
+            // Calculations based on string character values
+            const combined = (n1 + n2).toLowerCase().replace(/\s+/g, '');
+            let asciiSum = 0;
+            for (let i = 0; i < combined.length; i++) {
+                asciiSum += combined.charCodeAt(i);
+            }
+
+            // 1. Generate Secret Code (e.g., X9-A42B)
+            const codePart1 = String.fromCharCode(65 + (asciiSum % 26)); 
+            const codePart2 = (asciiSum * 7) % 100;
+            const codePart3 = String.fromCharCode(65 + ((asciiSum * 3) % 26));
+            const generatedCode = `SEC-${codePart1}${codePart2}${codePart3}`;
+
+            // 2. Generate Secret Number (A stable 4-digit numeric pattern)
+            const generatedNumber = ((asciiSum * 13) % 9000) + 1000;
+
+            // 3. Generate Secret Name (Smartly merges the first half of Name 1 and last half of Name 2)
+            const cleanN1 = n1.replace(/\s+/g, '');
+            const cleanN2 = n2.replace(/\s+/g, '');
+            const half1 = cleanN1.substring(0, Math.ceil(cleanN1.length / 2));
+            const half2 = cleanN2.substring(Math.floor(cleanN2.length / 2));
+            // Capitalize properly
+            const generatedName = (half1 + half2).charAt(0).toUpperCase() + (half1 + half2).slice(1).toLowerCase();
+
+            // 4. Generate Lucky Number (Single digit 1-9 via digital root logic)
+            let lucky = asciiSum % 9;
+            if (lucky === 0) lucky = 9;
+
+            // Display values inside the UI elements
+            document.getElementById('secretCode').innerText = generatedCode;
+            document.getElementById('secretNumber').innerText = generatedNumber;
+            document.getElementById('secretName').innerText = `"${generatedName}"`;
+            document.getElementById('luckyNumber').innerText = lucky;
+
+            // Show results container
+            document.getElementById('resultsBox').style.display = 'block';
+        }
+    </script>
+
+</body>
+</html>
